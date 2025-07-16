@@ -1,11 +1,1 @@
-1 | Bun.serve({
-        ^
-error: Failed to start server. Is port 3001 in use?
- syscall: "listen",
-   errno: 0,
-    code: "EADDRINUSE"
-
-      at /Users/vysakh/bun-proj/index.ts:1:5
-      at loadAndEvaluateModule (2:1)
-
-Bun v1.2.18 (macOS arm64)
+Server running on http://localhost:3001

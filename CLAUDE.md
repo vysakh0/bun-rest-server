@@ -6,73 +6,61 @@ alwaysApply: false
 
 Default to using Bun instead of Node.js.
 
-- Use `bun <file>` instead of `node <file>` or `ts-node <file>`
-- Use `bun --hot ./index.ts` to run the dev server
-- Use `bun test` instead of `jest` or `vitest`
-- Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
+- Use `nohup bun run ./index.ts > server.log 2>&1 &` to start the dev server and make sure to kill it once you're done with the testing.
+- Use `bun test` for testing unit and integration testing
 - Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
-- Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
 - Bun automatically loads .env, so don't use dotenv.
 
 ## APIs
 
 - `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
-- `Bun.redis` for Redis. Don't use `ioredis`.
-- `WebSocket` is built-in. Don't use `ws`.
 - Prefer `Bun.file` over `node:fs`'s readFile/writeFile
 - Bun.$`ls` instead of execa.
 
-## Testing
+For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
 
-Use `bun test` to run tests.
+## Project Structure
 
-```ts#index.test.ts
-import { test, expect } from "bun:test";
+This project uses a route-based API structure:
 
-test("hello world", () => {
-  expect(1).toBe(1);
-});
+- `index.ts` - Main server entry point using `Bun.serve()` on port 3001
+- `routes/index.ts` - Central route definitions
+- `routes/users.ts` - User CRUD operations
+- `routes/auth.ts` - Authentication endpoints (signup, etc.)
+- `db/schema/users.ts` - Drizzle ORM schema definitions
+- `db/config.ts` - Database configuration
+- `db/migrations/` - SQL migration files
+
+## Database
+
+- Using SQLite with Drizzle ORM
+- Database file: `app.db`
+- Users table includes: id, name, email, password (argon2 hashed), createdAt, updatedAt
+
+## Running the Server
+
+```bash
+# Run in background with logs
+nohup bun run ./index.ts > server.log 2>&1 &
 ```
 
-## Frontend
+## Database Commands
 
-Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully support React, CSS, Tailwind.
+```bash
+# Generate migrations
+bun run drizzle-kit generate
 
-Server:
+# Apply migrations
+bun run drizzle-kit migrate
+```
 
-````ts#index.ts
-import index from "./index.html"
+## Testing API Endpoints
 
-Bun.serve({
-  routes: {
-    "/": index,
-    "/api/users/:id": {
-      GET: (req) => {
-        return new Response(JSON.stringify({ id: req.params.id }));
-      },
-    },
-  },
-  // optional websocket support
-  websocket: {
-    open: (ws) => {
-      ws.send("Hello, world!");
-    },
-    message: (ws, message) => {
-      ws.send(message);
-    },
-    close: (ws) => {
-      // handle close
-    }
-  },
-  development: {
-    hmr: true,
-    console: true,
-  }
-})
-Then, run index.ts
+Whenever you create an endpoint, make sure to test it by running the server and using curl like this.
 
-```sh
-bun --hot ./index.ts
-````
-
-For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
+```bash
+# Test signup endpoint
+curl -X POST http://localhost:3001/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test User", "email": "test@example.com", "password": "password123"}'
+```
