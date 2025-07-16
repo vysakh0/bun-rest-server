@@ -111,7 +111,7 @@ export default [
       'no-duplicate-imports': 'error',
       'prefer-destructuring': 'off',
       'max-params': ['error', 4],
-      'func-style': 'off', // Allow both function declarations and expressions
+      'func-style': ['error', 'expression'], // Enforce arrow functions only
 
       // Import organization rules
       'import/no-namespace': 'off', // Allow namespace imports for schemas

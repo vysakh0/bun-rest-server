@@ -2,7 +2,7 @@ import type { InsertUser } from '@db/schema/users';
 
 let userCounter = 0;
 
-export function createUserData(overrides?: Partial<InsertUser>): InsertUser {
+export const createUserData = (overrides?: Partial<InsertUser>): InsertUser => {
   userCounter++;
   return {
     name: `Test User ${userCounter}`,
@@ -10,8 +10,8 @@ export function createUserData(overrides?: Partial<InsertUser>): InsertUser {
     password: 'password123',
     ...overrides,
   };
-}
+};
 
-export function resetUserCounter(): void {
+export const resetUserCounter = (): void => {
   userCounter = 0;
-}
+};
