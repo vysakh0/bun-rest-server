@@ -1,5 +1,5 @@
-import { db } from "../db/config";
-import { users } from "../db/schema";
+import { db } from "@db/config";
+import { users } from "@db/schema";
 import { eq } from "drizzle-orm";
 import * as argon2 from "argon2";
 

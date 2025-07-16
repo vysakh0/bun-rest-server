@@ -1,4 +1,4 @@
-import type { InsertUser } from "../../db/schema/users";
+import type { InsertUser } from "@db/schema/users";
 
 let userCounter = 0;
 

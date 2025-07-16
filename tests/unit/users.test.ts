@@ -1,9 +1,9 @@
 import { describe, test, expect, mock, beforeEach, afterEach } from "bun:test";
-import { createUserData } from "../../tests/factories/user.factory";
+import { createUserData } from "@tests/factories/user.factory";
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-import * as schema from "../../db/schema";
+import * as schema from "@db/schema";
 
 describe("User Route Handlers", () => {
   let testDb: Database;

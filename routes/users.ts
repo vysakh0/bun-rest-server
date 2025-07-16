@@ -1,5 +1,5 @@
-import { db } from "../db/config";
-import { users } from "../db/schema";
+import { db } from "@db/config";
+import { users } from "@db/schema";
 
 export const createUser = async (req: Request) => {
   try {

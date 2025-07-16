@@ -24,6 +24,15 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+
+    // Path aliases
+    "baseUrl": ".",
+    "paths": {
+      "@db/*": ["db/*"],
+      "@routes/*": ["routes/*"],
+      "@tests/*": ["tests/*"],
+      "@utils/*": ["utils/*"]
+    }
   }
 }
