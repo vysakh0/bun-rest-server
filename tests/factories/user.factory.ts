@@ -1,4 +1,4 @@
-import type { InsertUser } from "@db/schema/users";
+import type { InsertUser } from '@db/schema/users';
 
 let userCounter = 0;
 
@@ -7,11 +7,11 @@ export function createUserData(overrides?: Partial<InsertUser>): InsertUser {
   return {
     name: `Test User ${userCounter}`,
     email: `test${userCounter}@example.com`,
-    password: "password123",
-    ...overrides
+    password: 'password123',
+    ...overrides,
   };
 }
 
-export function resetUserCounter() {
+export function resetUserCounter(): void {
   userCounter = 0;
 }

@@ -1,46 +1,43 @@
-import { db } from "@db/config";
-import { users } from "@db/schema";
+import { db } from '@db/config';
+import { users } from '@db/schema';
 
-export const createUser = async (req: Request) => {
+export const createUser = async (req: Request): Promise<Response> => {
   try {
-    const body = await req.json();
-    const { name, email } = body;
+    const body = (await req.json()) as { name?: string; email?: string; password?: string };
+    const { name, email, password } = body;
 
-    if (!name || !email) {
-      return new Response(
-        JSON.stringify({ error: "Name and email are required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    if (!name || !email || !password) {
+      return new Response(JSON.stringify({ error: 'Name, email, and password are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
-    const [newUser] = await db
-      .insert(users)
-      .values({ name, email })
-      .returning();
+    const [newUser] = await db.insert(users).values({ name, email, password }).returning();
 
     return new Response(JSON.stringify(newUser), {
       status: 201,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 };
 
-export const listUsers = async () => {
+export const listUsers = async (): Promise<Response> => {
   try {
     const allUsers = await db.select().from(users);
-    
+
     return new Response(JSON.stringify(allUsers), {
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 };
