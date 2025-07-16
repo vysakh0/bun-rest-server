@@ -1,6 +1,6 @@
 ---
 description: Use Bun instead of Node.js, npm, pnpm, or vite.
-globs: "*.ts, *.tsx, *.html, *.css, *.js, *.jsx, package.json"
+globs: '*.ts, *.tsx, *.html, *.css, *.js, *.jsx, package.json'
 alwaysApply: false
 ---
 
@@ -52,6 +52,7 @@ This project is a Bun-based REST API with SQLite database using a route-based st
 **IMPORTANT**: Tests are self-contained and DO NOT require the dev server to be running. Integration tests create their own test server with an in-memory database.
 
 #### Test Structure
+
 - `tests/setup.ts` - Test setup with in-memory database for integration tests
 - `tests/unit/` - Unit tests that test individual functions in isolation
   - `tests/unit/users.test.ts` - Unit tests for user route handlers
@@ -62,6 +63,7 @@ This project is a Bun-based REST API with SQLite database using a route-based st
 - `utils/math.test.ts` - Utility function tests
 
 #### Running Tests
+
 ```bash
 # Run all tests (unit and integration)
 bun test
@@ -74,8 +76,9 @@ bun test tests/integration/
 ```
 
 #### How Tests Work
+
 - **Unit Tests**: Test individual functions with mocked dependencies
-- **Integration Tests**: 
+- **Integration Tests**:
   - Create their own Bun server instance on port 3002
   - Use in-memory SQLite database (`:memory:`)
   - Run migrations on the test database
@@ -126,3 +129,16 @@ curl -X POST http://localhost:3001/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"name": "Test User", "email": "test@example.com", "password": "password123"}'
 ```
+
+## Code Style & Quality
+
+This project uses ESLint with TypeScript and Prettier for code quality and formatting:
+
+- **Path Aliases**: Use `@db/*`, `@routes/*`, `@tests/*`, `@utils/*` instead of relative imports
+- **Function Style**: Prefer function declarations over arrow functions for exports
+- **Error Handling**: Use `unknown` type in catch blocks, check with `instanceof Error`
+- **TypeScript**: Explicit return types required, consistent type imports with `type` keyword
+- **Imports**: Auto-organized and alphabetized with proper grouping
+- **Pre-commit**: Automatic linting and formatting via Husky hooks
+
+Run `bun run lint` to check code quality and `bun run lint:fix` to auto-fix issues.

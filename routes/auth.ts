@@ -12,14 +12,13 @@ export const signup = async (req: Request): Promise<Response> => {
     if (!name || !email || !password) {
       return new Response(JSON.stringify({ error: 'Name, email, and password are required' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
       });
     }
 
     if (password.length < 8) {
       return new Response(
         JSON.stringify({ error: 'Password must be at least 8 characters long' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400 }
       );
     }
 
@@ -27,7 +26,6 @@ export const signup = async (req: Request): Promise<Response> => {
     if (!emailRegex.test(email)) {
       return new Response(JSON.stringify({ error: 'Invalid email format' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
       });
     }
 
@@ -35,7 +33,6 @@ export const signup = async (req: Request): Promise<Response> => {
     if (existingUser.length > 0) {
       return new Response(JSON.stringify({ error: 'Email already registered' }), {
         status: 409,
-        headers: { 'Content-Type': 'application/json' },
       });
     }
 
@@ -58,13 +55,11 @@ export const signup = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify(newUser), {
       status: 201,
-      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: unknown) {
     console.error('Signup error:', error);
     return new Response(JSON.stringify({ error: 'Failed to create account' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
     });
   }
 };

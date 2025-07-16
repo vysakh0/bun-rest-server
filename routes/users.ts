@@ -9,7 +9,6 @@ export const createUser = async (req: Request): Promise<Response> => {
     if (!name || !email || !password) {
       return new Response(JSON.stringify({ error: 'Name, email, and password are required' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
       });
     }
 
@@ -17,13 +16,11 @@ export const createUser = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify(newUser), {
       status: 201,
-      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
     });
   }
 };
@@ -32,14 +29,11 @@ export const listUsers = async (): Promise<Response> => {
   try {
     const allUsers = await db.select().from(users);
 
-    return new Response(JSON.stringify(allUsers), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify(allUsers));
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
     });
   }
 };
