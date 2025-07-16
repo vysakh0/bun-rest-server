@@ -1,6 +1,6 @@
+import { signup } from './auth';
 import { helloHandler } from './hello';
 import { createUser, listUsers } from './users';
-import { signup } from './auth';
 
 export const routes = {
   '/hello': helloHandler,

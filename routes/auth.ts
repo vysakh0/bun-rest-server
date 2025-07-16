@@ -1,7 +1,8 @@
+import { hash } from 'argon2';
+import { eq } from 'drizzle-orm';
+
 import { db } from '@db/config';
 import { users } from '@db/schema';
-import { eq } from 'drizzle-orm';
-import * as argon2 from 'argon2';
 
 export const signup = async (req: Request): Promise<Response> => {
   try {
@@ -38,7 +39,7 @@ export const signup = async (req: Request): Promise<Response> => {
       });
     }
 
-    const hashedPassword = await argon2.hash(password);
+    const hashedPassword = await hash(password);
 
     const [newUser] = await db
       .insert(users)
@@ -59,7 +60,7 @@ export const signup = async (req: Request): Promise<Response> => {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Signup error:', error);
     return new Response(JSON.stringify({ error: 'Failed to create account' }), {
       status: 500,

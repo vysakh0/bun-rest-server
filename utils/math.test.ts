@@ -1,4 +1,5 @@
 import { test, expect, describe } from 'bun:test';
+
 import { add, multiply, divide } from './math';
 
 describe('Math utilities', () => {

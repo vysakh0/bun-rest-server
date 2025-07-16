@@ -1,10 +1,12 @@
-import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
-import { createUserData, resetUserCounter } from '@tests/factories/user.factory';
+import type { Server } from 'bun';
 import { Database } from 'bun:sqlite';
+import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
+
 import * as schema from '@db/schema';
-import type { Server } from 'bun';
+
+import { createUserData, resetUserCounter } from '@tests/factories/user.factory';
 
 describe('User API Integration Tests', () => {
   let server: Server;
