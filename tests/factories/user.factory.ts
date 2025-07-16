@@ -7,6 +7,7 @@ export function createUserData(overrides?: Partial<InsertUser>): InsertUser {
   return {
     name: `Test User ${userCounter}`,
     email: `test${userCounter}@example.com`,
+    password: "password123",
     ...overrides
   };
 }

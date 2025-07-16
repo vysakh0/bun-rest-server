@@ -23,19 +23,19 @@ describe("User API Integration Tests", () => {
     
     const createUserWithTestDb = async (req: Request) => {
       try {
-        const body = await req.json();
-        const { name, email } = body;
+        const body = await req.json() as { name?: string; email?: string; password?: string };
+        const { name, email, password } = body;
 
-        if (!name || !email) {
+        if (!name || !email || !password) {
           return new Response(
-            JSON.stringify({ error: "Name and email are required" }),
+            JSON.stringify({ error: "Name, email, and password are required" }),
             { status: 400, headers: { "Content-Type": "application/json" } }
           );
         }
 
         const [newUser] = await db
           .insert(schema.users)
-          .values({ name, email })
+          .values({ name, email, password })
           .returning();
 
         return new Response(JSON.stringify(newUser), {
@@ -120,7 +120,7 @@ describe("User API Integration Tests", () => {
       const responseData = await response.json();
 
       expect(response.status).toBe(400);
-      expect(responseData.error).toBe("Name and email are required");
+      expect(responseData.error).toBe("Name, email, and password are required");
     });
 
     test("should return 400 for empty body", async () => {
@@ -133,7 +133,7 @@ describe("User API Integration Tests", () => {
       const responseData = await response.json();
 
       expect(response.status).toBe(400);
-      expect(responseData.error).toBe("Name and email are required");
+      expect(responseData.error).toBe("Name, email, and password are required");
     });
 
     test("should handle malformed JSON", async () => {

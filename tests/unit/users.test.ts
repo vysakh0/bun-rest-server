@@ -1,9 +1,9 @@
 import { describe, test, expect, mock, beforeEach, afterEach } from "bun:test";
-import { createUserData } from "../tests/factories/user.factory";
+import { createUserData } from "../../tests/factories/user.factory";
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-import * as schema from "../db/schema";
+import * as schema from "../../db/schema";
 
 describe("User Route Handlers", () => {
   let testDb: Database;
@@ -22,18 +22,18 @@ describe("User Route Handlers", () => {
   const createUserHandler = (database: any) => async (req: Request) => {
     try {
       const body = await req.json();
-      const { name, email } = body;
+      const { name, email, password } = body;
 
-      if (!name || !email) {
+      if (!name || !email || !password) {
         return new Response(
-          JSON.stringify({ error: "Name and email are required" }),
+          JSON.stringify({ error: "Name, email, and password are required" }),
           { status: 400, headers: { "Content-Type": "application/json" } }
         );
       }
 
       const [newUser] = await database
         .insert(schema.users)
-        .values({ name, email })
+        .values({ name, email, password })
         .returning();
 
       return new Response(JSON.stringify(newUser), {
@@ -78,6 +78,7 @@ describe("User Route Handlers", () => {
       expect(responseData).toMatchObject({
         name: userData.name,
         email: userData.email,
+        password: userData.password,
         id: expect.any(Number),
         createdAt: expect.any(String),
         updatedAt: expect.any(String)
@@ -87,27 +88,27 @@ describe("User Route Handlers", () => {
     test("should return 400 when name is missing", async () => {
       const createUser = createUserHandler(db);
       const mockReq = {
-        json: mock(() => Promise.resolve({ email: "test@example.com" }))
+        json: mock(() => Promise.resolve({ email: "test@example.com", password: "password123" }))
       };
 
       const response = await createUser(mockReq as any);
       const responseData = await response.json();
 
       expect(response.status).toBe(400);
-      expect(responseData.error).toBe("Name and email are required");
+      expect(responseData.error).toBe("Name, email, and password are required");
     });
 
     test("should return 400 when email is missing", async () => {
       const createUser = createUserHandler(db);
       const mockReq = {
-        json: mock(() => Promise.resolve({ name: "Test User" }))
+        json: mock(() => Promise.resolve({ name: "Test User", password: "password123" }))
       };
 
       const response = await createUser(mockReq as any);
       const responseData = await response.json();
 
       expect(response.status).toBe(400);
-      expect(responseData.error).toBe("Name and email are required");
+      expect(responseData.error).toBe("Name, email, and password are required");
     });
 
     test("should handle JSON parsing errors", async () => {
