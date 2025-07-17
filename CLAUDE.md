@@ -86,6 +86,28 @@ bun test tests/integration/
   - Clean up after each test
   - DO NOT require the dev server to be running
 
+### Types
+
+- `types/handlers.ts` - API handler type definitions for different request/response patterns
+- `types/auth.ts` - Authentication-related request/response types
+- `types/users.ts` - User-related request/response types
+
+**When creating new route handlers**, always use the handler types from `types/handlers.ts`:
+
+- `AsyncHandler` - For handlers that accept a Request and return Promise<Response>
+- `AsyncNoRequestHandler` - For handlers that don't need request data and return Promise<Response>
+- `SyncHandler` - For synchronous handlers that return Response directly
+
+Example:
+
+```typescript
+import type { AsyncHandler } from '@type/handlers';
+
+export const myHandler: AsyncHandler = async (req) => {
+  // Handler implementation
+};
+```
+
 ### Utilities
 
 - `utils/math.ts` - Mathematical utility functions (add, multiply, divide)
@@ -134,7 +156,7 @@ curl -X POST http://localhost:3001/api/auth/signup \
 
 This project uses ESLint with TypeScript and Prettier for code quality and formatting:
 
-- **Path Aliases**: Use `@db/*`, `@routes/*`, `@tests/*`, `@utils/*` instead of relative imports
+- **Path Aliases**: Use `@db/*`, `@routes/*`, `@tests/*`, `@utils/*`, `@type/*` instead of relative imports
 - **Function Style**: Prefer arrow functions for exports instead of functions declarations
 - **Error Handling**: Use `unknown` type in catch blocks, check with `instanceof Error`
 - **TypeScript**: Explicit return types required, consistent type imports with `type` keyword

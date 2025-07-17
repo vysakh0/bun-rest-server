@@ -7,10 +7,9 @@ import { validateSignupData } from '@utils/validation';
 import { db } from '@db/config';
 import { users } from '@db/schema';
 
-import type { SignupRequest, UserResponse } from '@type/auth';
-import type { AsyncHandler } from '@type/handlers';
-
 import { HTTP_STATUS } from '@/constants/http';
+import type { SignupRequest, UserResponse } from '@/type/auth';
+import type { AsyncHandler } from '@/type/handlers';
 
 export const signup: AsyncHandler = async (req) => {
   try {

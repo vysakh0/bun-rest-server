@@ -4,10 +4,9 @@ import { validateUserData } from '@utils/validation';
 import { db } from '@db/config';
 import { users } from '@db/schema';
 
-import type { AsyncHandler, AsyncNoRequestHandler } from '@type/handlers';
-import type { CreateUserRequest } from '@type/users';
-
 import { HTTP_STATUS } from '@/constants/http';
+import type { AsyncHandler, AsyncNoRequestHandler } from '@/type/handlers';
+import type { CreateUserRequest } from '@/type/users';
 
 export const createUser: AsyncHandler = async (req) => {
   try {
