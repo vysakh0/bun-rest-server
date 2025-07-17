@@ -86,6 +86,12 @@ bun test tests/integration/
   - Clean up after each test
   - DO NOT require the dev server to be running
 
+#### Testing Guidelines
+
+- **Routes**: Always write integration tests for any new routes or API endpoints
+- **Complex Logic**: Write unit tests for any complex logic in `utils/`, `service/`, `lib/`, or similar folders
+- **Directory Structure**: Place unit tests in `tests/unit/` with matching subdirectories (e.g., `tests/unit/utils/`, `tests/unit/service/`)
+
 ### Types
 
 - `types/handlers.ts` - API handler type definitions for different request/response patterns
