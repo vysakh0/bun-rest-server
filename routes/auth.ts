@@ -1,44 +1,36 @@
 import { hash } from 'argon2';
 import { eq } from 'drizzle-orm';
 
+import { createdResponse, errorResponse } from '@utils/response';
+import { validateSignupData } from '@utils/validation';
+
 import { db } from '@db/config';
 import { users } from '@db/schema';
 
-export const signup = async (req: Request): Promise<Response> => {
+import type { SignupRequest, UserResponse } from '@type/auth';
+import type { AsyncHandler } from '@type/handlers';
+
+import { HTTP_STATUS } from '@/constants/http';
+
+export const signup: AsyncHandler = async (req) => {
   try {
-    const body = (await req.json()) as { name?: string; email?: string; password?: string };
+    const body = (await req.json()) as SignupRequest;
+
+    const validationError = validateSignupData(body);
+    if (validationError) {
+      return errorResponse(validationError.message, validationError.status);
+    }
+
     const { name, email, password } = body;
-
-    if (!name || !email || !password) {
-      return new Response(JSON.stringify({ error: 'Name, email, and password are required' }), {
-        status: 400,
-      });
-    }
-
-    if (password.length < 8) {
-      return new Response(
-        JSON.stringify({ error: 'Password must be at least 8 characters long' }),
-        { status: 400 }
-      );
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return new Response(JSON.stringify({ error: 'Invalid email format' }), {
-        status: 400,
-      });
-    }
 
     const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (existingUser.length > 0) {
-      return new Response(JSON.stringify({ error: 'Email already registered' }), {
-        status: 409,
-      });
+      return errorResponse('Email already registered', HTTP_STATUS.CONFLICT);
     }
 
     const hashedPassword = await hash(password);
 
-    const [newUser] = await db
+    const result: UserResponse[] = await db
       .insert(users)
       .values({
         name,
@@ -53,13 +45,11 @@ export const signup = async (req: Request): Promise<Response> => {
         updatedAt: users.updatedAt,
       });
 
-    return new Response(JSON.stringify(newUser), {
-      status: 201,
-    });
+    const [newUser] = result;
+
+    return createdResponse(newUser);
   } catch (error: unknown) {
     console.error('Signup error:', error);
-    return new Response(JSON.stringify({ error: 'Failed to create account' }), {
-      status: 500,
-    });
+    return errorResponse('Failed to create account', HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 };

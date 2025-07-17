@@ -39,7 +39,7 @@ describe('User API Integration Tests', () => {
       const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(400);
-      expect(responseData.error).toBe('Name, email, and password are required');
+      expect(responseData.error).toBe('email, password are required');
     });
 
     test('should return 400 for empty body', async () => {
@@ -47,7 +47,7 @@ describe('User API Integration Tests', () => {
       const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(400);
-      expect(responseData.error).toBe('Name, email, and password are required');
+      expect(responseData.error).toBe('name, email, password are required');
     });
 
     test('should handle malformed JSON', async () => {

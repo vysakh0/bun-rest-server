@@ -73,6 +73,9 @@ export default [
       '@typescript-eslint/prefer-string-starts-ends-with': 'error',
       '@typescript-eslint/array-type': ['error', { default: 'array' }],
       '@typescript-eslint/no-floating-promises': 'off',
+      '@typescript-eslint/prefer-function-type': 'error',
+      '@typescript-eslint/no-empty-object-type': 'error',
+      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
 
       // TypeScript naming conventions
       '@typescript-eslint/naming-convention': [
@@ -135,7 +138,12 @@ export default [
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
           pathGroups: [
             {
-              pattern: '@db/**',
+              pattern: '@constants/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@utils/**',
               group: 'internal',
               position: 'before',
             },
@@ -145,12 +153,17 @@ export default [
               position: 'before',
             },
             {
+              pattern: '@db/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
               pattern: '@tests/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@utils/**',
+              pattern: '@type/**',
               group: 'internal',
               position: 'before',
             },

@@ -29,10 +29,13 @@
     // Path aliases
     "baseUrl": ".",
     "paths": {
+      "@/*": ["./*"],
       "@db/*": ["db/*"],
       "@routes/*": ["routes/*"],
       "@tests/*": ["tests/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@constants/*": ["constants/*"],
+      "@type/*": ["types/*"]
     }
   }
 }

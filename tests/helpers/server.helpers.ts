@@ -2,11 +2,11 @@ import type { Server } from 'bun';
 
 import { routes } from '@routes/index';
 
-export type TestServer = {
+export interface TestServer {
   server: Server;
   baseUrl: string;
   stop: () => void;
-};
+}
 
 export const createTestServer = (port: number = 3002): TestServer => {
   const baseUrl = `http://localhost:${port}`;
