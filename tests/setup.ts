@@ -1,26 +1,17 @@
-import { Database } from 'bun:sqlite';
-import { beforeAll, afterAll, beforeEach } from 'bun:test';
-import { drizzle } from 'drizzle-orm/bun-sqlite';
-import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
+import { beforeAll, beforeEach } from 'bun:test';
 
-import * as schema from '@db/schema';
+import { db } from '@db/config';
 
-let testDb: Database;
-export let db: ReturnType<typeof drizzle>;
+import { resetUserCounter } from '@tests/factories/user.factory';
+import { cleanDatabase } from '@tests/helpers/db.helpers';
 
 beforeAll(() => {
-  testDb = new Database(':memory:');
-  db = drizzle(testDb, { schema });
-
-  migrate(db, { migrationsFolder: './db/migrations' });
+  resetUserCounter();
 });
 
 beforeEach(async () => {
-  await db.delete(schema.users);
+  await cleanDatabase(db);
+  resetUserCounter();
 });
 
-afterAll(() => {
-  testDb.close();
-});
-
-export { schema };
+export { db };

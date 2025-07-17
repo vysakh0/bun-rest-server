@@ -1,29 +1,14 @@
-import { Database } from 'bun:sqlite';
-import { describe, test, expect, mock, beforeEach, afterEach } from 'bun:test';
-import { drizzle } from 'drizzle-orm/bun-sqlite';
-import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
+import { describe, test, expect, mock } from 'bun:test';
 
 import * as schema from '@db/schema';
 
-import { createUserData } from '@tests/factories/user.factory';
+import { buildUserData, createUserInDb } from '@tests/factories/user.factory';
+import { db } from '@tests/setup';
 
 describe('User Route Handlers', () => {
-  let testDb: Database;
-  let db: ReturnType<typeof drizzle>;
-
-  beforeEach(() => {
-    testDb = new Database(':memory:');
-    db = drizzle(testDb, { schema });
-    migrate(db, { migrationsFolder: './db/migrations' });
-  });
-
-  afterEach(() => {
-    testDb.close();
-  });
-
   const createUserHandler = (database: any) => async (req: Request) => {
     try {
-      const body = await req.json();
+      const body = (await req.json()) as { name?: string; email?: string; password?: string };
       const { name, email, password } = body;
 
       if (!name || !email || !password) {
@@ -68,13 +53,13 @@ describe('User Route Handlers', () => {
   describe('createUser', () => {
     test('should create a user with valid data', async () => {
       const createUser = createUserHandler(db);
-      const userData = createUserData();
+      const userData = buildUserData();
       const mockReq = {
         json: mock(() => Promise.resolve(userData)),
       };
 
       const response = await createUser(mockReq as any);
-      const responseData = await response.json();
+      const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(201);
       expect(responseData).toMatchObject({
@@ -94,7 +79,7 @@ describe('User Route Handlers', () => {
       };
 
       const response = await createUser(mockReq as any);
-      const responseData = await response.json();
+      const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(400);
       expect(responseData.error).toBe('Name, email, and password are required');
@@ -107,7 +92,7 @@ describe('User Route Handlers', () => {
       };
 
       const response = await createUser(mockReq as any);
-      const responseData = await response.json();
+      const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(400);
       expect(responseData.error).toBe('Name, email, and password are required');
@@ -120,7 +105,7 @@ describe('User Route Handlers', () => {
       };
 
       const response = await createUser(mockReq as any);
-      const responseData = await response.json();
+      const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(500);
       expect(responseData.error).toBe('Invalid JSON');
@@ -128,16 +113,16 @@ describe('User Route Handlers', () => {
 
     test('should handle duplicate email errors', async () => {
       const createUser = createUserHandler(db);
-      const userData = createUserData();
+      const userData = buildUserData();
 
-      await db.insert(schema.users).values(userData);
+      await createUserInDb(db, userData);
 
       const mockReq = {
         json: mock(() => Promise.resolve(userData)),
       };
 
       const response = await createUser(mockReq as any);
-      const responseData = await response.json();
+      const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(500);
       expect(responseData.error).toContain('UNIQUE constraint failed');
@@ -148,7 +133,7 @@ describe('User Route Handlers', () => {
     test('should return empty array when no users exist', async () => {
       const listUsers = listUsersHandler(db);
       const response = await listUsers();
-      const responseData = await response.json();
+      const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(200);
       expect(responseData).toEqual([]);
@@ -156,13 +141,14 @@ describe('User Route Handlers', () => {
 
     test('should return all users', async () => {
       const listUsers = listUsersHandler(db);
-      const userData1 = createUserData();
-      const userData2 = createUserData();
+      const userData1 = buildUserData();
+      const userData2 = buildUserData();
 
-      await db.insert(schema.users).values([userData1, userData2]);
+      await createUserInDb(db, userData1);
+      await createUserInDb(db, userData2);
 
       const response = await listUsers();
-      const responseData = await response.json();
+      const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(200);
       expect(responseData).toHaveLength(2);

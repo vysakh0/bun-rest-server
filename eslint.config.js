@@ -80,7 +80,7 @@ export default [
         {
           selector: 'variable',
           types: ['boolean'],
-          format: ['camelCase'],
+          format: ['camelCase', 'PascalCase'],
           prefix: ['is', 'should', 'has', 'can', 'did', 'will'],
         },
         {

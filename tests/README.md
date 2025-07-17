@@ -42,7 +42,7 @@ bun test --watch
 ## Testing Best Practices
 
 1. **Isolation**: Each test runs with a clean database state
-2. **Test Data**: Use factories (`createUserData()`) to generate test data
+2. **Test Data**: Use factories (`buildUserData()`) to generate test data
 3. **Coverage**: Tests cover:
    - Happy path scenarios
    - Error handling (validation, database errors)
@@ -52,11 +52,13 @@ bun test --watch
 ## Test Categories
 
 ### Unit Tests (`routes/users.test.ts`)
+
 - Test individual route handlers in isolation
 - Mock request objects
 - Direct database access for setup/verification
 
 ### Integration Tests (`tests/integration/users.integration.test.ts`)
+
 - Test full API endpoints through HTTP requests
 - Verify server behavior and response formats
 - Test error scenarios at the HTTP level

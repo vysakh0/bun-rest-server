@@ -135,7 +135,7 @@ curl -X POST http://localhost:3001/api/auth/signup \
 This project uses ESLint with TypeScript and Prettier for code quality and formatting:
 
 - **Path Aliases**: Use `@db/*`, `@routes/*`, `@tests/*`, `@utils/*` instead of relative imports
-- **Function Style**: Prefer function declarations over arrow functions for exports
+- **Function Style**: Prefer arrow functions for exports instead of functions declarations
 - **Error Handling**: Use `unknown` type in catch blocks, check with `instanceof Error`
 - **TypeScript**: Explicit return types required, consistent type imports with `type` keyword
 - **Imports**: Auto-organized and alphabetized with proper grouping
