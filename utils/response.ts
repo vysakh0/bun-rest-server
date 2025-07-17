@@ -1,4 +1,6 @@
-export const jsonResponse = (data: unknown, status = 200): Response => {
+import { HTTP_STATUS, type HttpStatus } from '@constants/http';
+
+export const jsonResponse = (data: unknown, status: HttpStatus = HTTP_STATUS.OK): Response => {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
@@ -7,14 +9,17 @@ export const jsonResponse = (data: unknown, status = 200): Response => {
   });
 };
 
-export const errorResponse = (message: string, status = 400): Response => {
+export const errorResponse = (
+  message: string,
+  status: HttpStatus = HTTP_STATUS.BAD_REQUEST
+): Response => {
   return jsonResponse({ error: message }, status);
 };
 
-export const successResponse = (data: unknown, status = 200): Response => {
+export const successResponse = (data: unknown, status: HttpStatus = HTTP_STATUS.OK): Response => {
   return jsonResponse(data, status);
 };
 
 export const createdResponse = (data: unknown): Response => {
-  return jsonResponse(data, 201);
+  return jsonResponse(data, HTTP_STATUS.CREATED);
 };

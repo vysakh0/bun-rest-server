@@ -20,7 +20,8 @@ export const signup: AsyncHandler = async (req) => {
       return errorResponse(validationError.message, validationError.status);
     }
 
-    const { name, email, password } = body;
+    // After validation, we know these fields are present
+    const { name, email, password } = body as Required<SignupRequest>;
 
     const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (existingUser.length > 0) {

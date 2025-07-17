@@ -87,5 +87,14 @@ export const validateUserData = (data: {
   email?: string;
   password?: string;
 }): ValidationError | null => {
-  return validateRequired(data, ['name', 'email', 'password']);
+  const requiredError = validateRequired(data, ['name', 'email', 'password']);
+  if (requiredError) return requiredError;
+
+  const emailError = validateEmail(data.email as string);
+  if (emailError) return emailError;
+
+  const passwordError = validatePassword(data.password as string);
+  if (passwordError) return passwordError;
+
+  return null;
 };
