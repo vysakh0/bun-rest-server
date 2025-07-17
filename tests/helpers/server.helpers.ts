@@ -8,11 +8,14 @@ export interface TestServer {
   stop: () => void;
 }
 
-export const createTestServer = (port: number = 3002): TestServer => {
-  const baseUrl = `http://localhost:${port}`;
+let portCounter = 3002;
+
+export const createTestServer = (port?: number): TestServer => {
+  const actualPort = port || portCounter++;
+  const baseUrl = `http://localhost:${actualPort}`;
 
   const server = Bun.serve({
-    port,
+    port: actualPort,
     routes,
     development: false,
   });
@@ -20,7 +23,13 @@ export const createTestServer = (port: number = 3002): TestServer => {
   return {
     server,
     baseUrl,
-    stop: () => server.stop(),
+    stop: () => {
+      try {
+        server.stop();
+      } catch {
+        // Ignore errors during shutdown
+      }
+    },
   };
 };
 

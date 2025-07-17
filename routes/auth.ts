@@ -13,7 +13,16 @@ import type { AsyncHandler } from '@/type/handlers';
 
 export const signup: AsyncHandler = async (req) => {
   try {
-    const body = (await req.json()) as SignupRequest;
+    let body: SignupRequest;
+
+    try {
+      body = (await req.json()) as SignupRequest;
+    } catch (jsonError: unknown) {
+      if (jsonError instanceof SyntaxError) {
+        return errorResponse('Invalid JSON format', HTTP_STATUS.BAD_REQUEST);
+      }
+      throw jsonError;
+    }
 
     const validationError = validateSignupData(body);
     if (validationError) {
