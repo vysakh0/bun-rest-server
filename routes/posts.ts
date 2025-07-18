@@ -26,6 +26,7 @@ export const createPost: AsyncHandler = async (req) => {
       userId,
     })
     .returning({
+      id: posts.id,
       title: posts.title,
       createdAt: posts.createdAt,
       updatedAt: posts.updatedAt,

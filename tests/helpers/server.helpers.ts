@@ -45,11 +45,15 @@ export const makeJsonRequest = async (
   baseUrl: string,
   endpoint: string,
   method: string = 'GET',
-  body?: any
+  body?: any,
+  additionalHeaders?: Record<string, string>
 ): Promise<Response> => {
   const options: globalThis.RequestInit = {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...additionalHeaders,
+    },
   };
 
   if (body) {
