@@ -14,6 +14,7 @@
     "@types/bun": "latest",
     "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/eslint-plugin-tslint": "^7.0.2",
+    "@types/jsonwebtoken": "^9.0.10",
     "@typescript-eslint/parser": "^8.37.0",
     "eslint": "^9.31.0",
     "eslint-config-prettier": "^10.1.5",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "drizzle-kit": "^0.31.4",
-    "drizzle-orm": "^0.44.3"
+    "drizzle-orm": "^0.44.3",
+    "jsonwebtoken": "^9.0.2"
   }
 }

@@ -26,6 +26,8 @@ export default [
         Request: 'readonly',
         Response: 'readonly',
         fetch: 'readonly',
+        btoa: 'readonly',
+        TextEncoder: 'readonly',
       },
     },
     plugins: {
@@ -164,6 +166,11 @@ export default [
             },
             {
               pattern: '@type/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@middlewares/**',
               group: 'internal',
               position: 'before',
             },

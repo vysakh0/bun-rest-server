@@ -1,10 +1,11 @@
-import { createdResponse, errorResponse } from '@utils/response';
-import { validateSignupData } from '@utils/validation';
+import { createdResponse, errorResponse, successResponse } from '@utils/response';
+import { generateToken } from '@utils/token';
+import { validateSignupData, validateLoginData } from '@utils/validation';
 
 import { users } from '@db/schema';
 
 import { HTTP_STATUS } from '@/constants/http';
-import type { SignupRequest, UserResponse } from '@/type/auth';
+import type { SignupRequest, LoginRequest, UserResponse, LoginResponse } from '@/type/auth';
 import type { AsyncHandler } from '@/type/handlers';
 import { userQueries } from '@queries/user';
 
@@ -56,5 +57,57 @@ export const signup: AsyncHandler = async (req) => {
   } catch (error: unknown) {
     console.error('Signup error:', error);
     return errorResponse('Failed to create account', HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+};
+
+export const login: AsyncHandler = async (req) => {
+  try {
+    let body: LoginRequest;
+
+    try {
+      body = (await req.json()) as LoginRequest;
+    } catch (jsonError: unknown) {
+      if (jsonError instanceof SyntaxError) {
+        return errorResponse('Invalid JSON format', HTTP_STATUS.BAD_REQUEST);
+      }
+      throw jsonError;
+    }
+
+    const validationError = validateLoginData(body);
+    if (validationError) {
+      return errorResponse(validationError.message, validationError.status);
+    }
+
+    const { email, password } = body as Required<LoginRequest>;
+
+    const user = await userQueries.findByEmail(email);
+    if (!user) {
+      return errorResponse('Invalid email or password', HTTP_STATUS.UNAUTHORIZED);
+    }
+
+    const isValidPassword = await Bun.password.verify(password, user.password);
+    if (!isValidPassword) {
+      return errorResponse('Invalid email or password', HTTP_STATUS.UNAUTHORIZED);
+    }
+
+    const userResponse: UserResponse = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+
+    const token = generateToken(user.id);
+
+    const loginResponse: LoginResponse = {
+      user: userResponse,
+      token,
+    };
+
+    return successResponse(loginResponse);
+  } catch (error: unknown) {
+    console.error('Login error:', error);
+    return errorResponse('Failed to login', HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 };

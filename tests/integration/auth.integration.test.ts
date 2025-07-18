@@ -112,6 +112,116 @@ describe('Auth API Integration Tests', () => {
     });
   });
 
+  describe('POST /api/auth/login', () => {
+    test('should login with valid credentials', async () => {
+      const userData = buildUserData();
+
+      // First signup
+      const signupResponse = await makeJsonRequest(
+        server.baseUrl,
+        '/api/auth/signup',
+        'POST',
+        userData
+      );
+      expect(signupResponse.status).toBe(201);
+
+      // Then login
+      const loginResponse = await makeJsonRequest(server.baseUrl, '/api/auth/login', 'POST', {
+        email: userData.email,
+        password: userData.password,
+      });
+      const loginData = (await loginResponse.json()) as any;
+
+      expect(loginResponse.status).toBe(200);
+      expect(loginData).toHaveProperty('user');
+      expect(loginData).toHaveProperty('token');
+      expect(loginData.user).toMatchObject({
+        email: userData.email,
+        name: userData.name,
+      });
+      expect(loginData.user).not.toHaveProperty('password');
+      expect(typeof loginData.token).toBe('string');
+    });
+
+    test('should return 401 for invalid email', async () => {
+      const response = await makeJsonRequest(server.baseUrl, '/api/auth/login', 'POST', {
+        email: 'nonexistent@example.com',
+        password: 'password123',
+      });
+      const responseData = (await response.json()) as any;
+
+      expect(response.status).toBe(401);
+      expect(responseData.error).toBe('Invalid email or password');
+    });
+
+    test('should return 401 for invalid password', async () => {
+      const userData = buildUserData();
+
+      // First signup
+      const signupResponse = await makeJsonRequest(
+        server.baseUrl,
+        '/api/auth/signup',
+        'POST',
+        userData
+      );
+      expect(signupResponse.status).toBe(201);
+
+      // Login with wrong password
+      const loginResponse = await makeJsonRequest(server.baseUrl, '/api/auth/login', 'POST', {
+        email: userData.email,
+        password: 'wrongpassword',
+      });
+      const loginData = (await loginResponse.json()) as any;
+
+      expect(loginResponse.status).toBe(401);
+      expect(loginData.error).toBe('Invalid email or password');
+    });
+
+    test('should return 400 for missing email', async () => {
+      const response = await makeJsonRequest(server.baseUrl, '/api/auth/login', 'POST', {
+        password: 'password123',
+      });
+      const responseData = (await response.json()) as any;
+
+      expect(response.status).toBe(400);
+      expect(responseData.error).toBe('email is required');
+    });
+
+    test('should return 400 for missing password', async () => {
+      const response = await makeJsonRequest(server.baseUrl, '/api/auth/login', 'POST', {
+        email: 'test@example.com',
+      });
+      const responseData = (await response.json()) as any;
+
+      expect(response.status).toBe(400);
+      expect(responseData.error).toBe('password is required');
+    });
+
+    test('should return 400 for invalid email format', async () => {
+      const response = await makeJsonRequest(server.baseUrl, '/api/auth/login', 'POST', {
+        email: 'invalidemail',
+        password: 'password123',
+      });
+      const responseData = (await response.json()) as any;
+
+      expect(response.status).toBe(400);
+      expect(responseData.error).toBe('Invalid email format');
+    });
+
+    test('should handle malformed JSON', async () => {
+      const response = await fetch(`${server.baseUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{ invalid json',
+      });
+
+      const responseData = (await response.json()) as any;
+
+      expect(response.status).toBe(400);
+      expect(responseData.error).toBe('Invalid JSON format');
+    });
+  });
+
   describe('Error Scenarios', () => {
     test('should return 404 for unknown auth routes', async () => {
       const response = await makeJsonRequest(server.baseUrl, '/api/auth/unknown');
@@ -120,6 +230,14 @@ describe('Auth API Integration Tests', () => {
 
     test('should handle unsupported methods on signup', async () => {
       const response = await fetch(`${server.baseUrl}/api/auth/signup`, {
+        method: 'GET',
+      });
+
+      expect(response.status).toBe(404);
+    });
+
+    test('should handle unsupported methods on login', async () => {
+      const response = await fetch(`${server.baseUrl}/api/auth/login`, {
         method: 'GET',
       });
 
