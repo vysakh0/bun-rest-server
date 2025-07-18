@@ -7,5 +7,3 @@ export const compose = (...middlewares: Middleware[]) => {
     return middlewares.reduceRight((acc, middleware) => middleware(acc), handler);
   };
 };
-
-export const withProtection = compose;

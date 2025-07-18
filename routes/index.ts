@@ -1,26 +1,33 @@
-import { withErrorHandler, withProtection } from '@middlewares/index';
+import { withErrorHandler, compose, withAuth } from '@middlewares/index';
 
 import { login, signup } from './auth';
+import { createPost, getUserPosts, getAllPosts } from './posts';
 import { createUser, getCurrentUser, listUsers } from './users';
 
-// Create a protected middleware chain that includes error handling and authentication
-const protectedRoute = withProtection(withErrorHandler);
+const protectedRoute = compose(withErrorHandler, withAuth);
+const openRoute = compose(withErrorHandler);
 
 export const routes = {
-  // Public routes (with error handling)
   '/api/auth/signup': {
-    POST: withErrorHandler(signup),
+    POST: openRoute(signup),
   },
   '/api/auth/login': {
-    POST: withErrorHandler(login),
+    POST: openRoute(login),
   },
 
-  // Protected routes (with error handling and authentication)
   '/api/users': {
-    GET: protectedRoute(listUsers),
-    POST: withErrorHandler(createUser), // Keep this public for now, or make it protected if needed
+    GET: openRoute(listUsers),
+    POST: openRoute(createUser), // Keep this public for now, or make it protected if needed
   },
   '/api/users/me': {
     GET: protectedRoute(getCurrentUser),
+  },
+
+  '/api/posts': {
+    GET: openRoute(getAllPosts), // Public - anyone can view all posts
+    POST: protectedRoute(createPost), // Protected - only authenticated users can create posts
+  },
+  '/api/posts/me': {
+    GET: protectedRoute(getUserPosts), // Protected - view your own posts
   },
 };

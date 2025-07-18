@@ -15,6 +15,13 @@
       "when": 1752650776466,
       "tag": "0001_charming_doctor_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1752854964412,
+      "tag": "0002_cynical_sasquatch",
+      "breakpoints": true
     }
   ]
 }
