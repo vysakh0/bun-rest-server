@@ -1,23 +1,26 @@
-import { withAuth } from '@middlewares/auth';
+import { withErrorHandler, withProtection } from '@middlewares/index';
 
 import { login, signup } from './auth';
 import { createUser, getCurrentUser, listUsers } from './users';
 
+// Create a protected middleware chain that includes error handling and authentication
+const protectedRoute = withProtection(withErrorHandler);
+
 export const routes = {
-  // Public routes
+  // Public routes (with error handling)
   '/api/auth/signup': {
-    POST: signup,
+    POST: withErrorHandler(signup),
   },
   '/api/auth/login': {
-    POST: login,
+    POST: withErrorHandler(login),
   },
 
-  // Protected routes
+  // Protected routes (with error handling and authentication)
   '/api/users': {
-    GET: withAuth(listUsers),
-    POST: createUser, // Keep this public for now, or make it protected if needed
+    GET: protectedRoute(listUsers),
+    POST: withErrorHandler(createUser), // Keep this public for now, or make it protected if needed
   },
   '/api/users/me': {
-    GET: withAuth(getCurrentUser),
+    GET: protectedRoute(getCurrentUser),
   },
 };
