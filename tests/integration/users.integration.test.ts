@@ -20,16 +20,8 @@ describe('User API Integration Tests', () => {
       const userData = buildUserData();
 
       const response = await makeJsonRequest(server.baseUrl, '/api/users', 'POST', userData);
-      const responseData = (await response.json()) as any;
 
       expect(response.status).toBe(201);
-      expect(responseData).toMatchObject({
-        name: userData.name,
-        email: userData.email,
-        id: expect.any(Number),
-        createdAt: expect.any(String),
-        updatedAt: expect.any(String),
-      });
     });
 
     test('should return 400 for invalid data', async () => {

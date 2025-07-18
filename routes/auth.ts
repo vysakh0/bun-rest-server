@@ -1,15 +1,14 @@
 import { hash } from 'argon2';
-import { eq } from 'drizzle-orm';
 
 import { createdResponse, errorResponse } from '@utils/response';
 import { validateSignupData } from '@utils/validation';
 
-import { db } from '@db/config';
 import { users } from '@db/schema';
 
 import { HTTP_STATUS } from '@/constants/http';
 import type { SignupRequest, UserResponse } from '@/type/auth';
 import type { AsyncHandler } from '@/type/handlers';
+import { userQueries } from '@queries/user';
 
 export const signup: AsyncHandler = async (req) => {
   try {
@@ -32,16 +31,15 @@ export const signup: AsyncHandler = async (req) => {
     // After validation, we know these fields are present
     const { name, email, password } = body as Required<SignupRequest>;
 
-    const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    if (existingUser.length > 0) {
+    const existingUser = await userQueries.findByEmail(email);
+    if (existingUser) {
       return errorResponse('Email already registered', HTTP_STATUS.CONFLICT);
     }
 
     const hashedPassword = await hash(password);
 
-    const result: UserResponse[] = await db
-      .insert(users)
-      .values({
+    const result: UserResponse[] = await userQueries
+      .create({
         name,
         email,
         password: hashedPassword,
