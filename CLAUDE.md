@@ -11,11 +11,54 @@ Default to using Bun instead of Node.js.
 - Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
 - Bun automatically loads .env, so don't use dotenv.
 
-## APIs
+## APIs - Use Bun Native Functions
 
-- `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
-- Prefer `Bun.file` over `node:fs`'s readFile/writeFile
-- Bun.$`ls` instead of execa.
+**ALWAYS prefer Bun's native APIs over external libraries:**
+
+### Server & HTTP
+
+- `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`, `fastify`, or `koa`.
+- Use `new Response()` and `Request` objects directly instead of framework wrappers
+
+### File System
+
+- `Bun.file()` instead of `node:fs`'s readFile/writeFile or `fs-extra`
+- `Bun.write()` for writing files
+- `await Bun.file(path).text()` for reading text files
+- `await Bun.file(path).json()` for reading JSON files
+
+### Shell Commands
+
+- `Bun.$`command``instead of`execa`, `child_process`, or `shelljs`
+- Example: `await Bun.$`ls -la`` for shell commands
+
+### Password Hashing
+
+- `Bun.password.hash()` instead of `argon2`, `bcrypt`, or `scrypt`
+- `Bun.password.verify()` for password verification
+- No need for external password hashing libraries
+
+### Utilities
+
+- `Bun.hash()` for hashing (CRC32, Wyhash, etc.)
+- `Bun.env` for environment variables (automatically loaded from .env)
+- `Bun.spawn()` for spawning processes instead of `child_process`
+
+### SQLite Database
+
+- `Bun.Database` for direct SQLite operations instead of `better-sqlite3`
+- Only use `drizzle-orm` for schema management and migrations
+
+### Testing
+
+- Use Bun's built-in test runner with `bun test`
+- `expect()` and other test utilities are built-in
+
+### HTTP Requests
+
+- Use `fetch()` (built into Bun) instead of `axios`, `node-fetch`, or `got`
+
+**Remove external dependencies when Bun provides equivalent functionality.**
 
 For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
 
@@ -26,7 +69,7 @@ This project is a Bun-based REST API with SQLite database using a route-based st
 ### Core Files
 
 - `index.ts` - Main server entry point using `Bun.serve()` on port 3001
-- `package.json` - Dependencies: argon2, better-sqlite3, drizzle-orm, drizzle-kit
+- `package.json` - Dependencies: drizzle-orm, drizzle-kit (use Bun native APIs instead of external libraries)
 - `tsconfig.json` - TypeScript configuration
 - `bunfig.toml` - Bun configuration
 - `drizzle.config.ts` - Drizzle ORM configuration
@@ -128,7 +171,7 @@ export const myHandler: AsyncHandler = async (req) => {
 
 - Using SQLite with Drizzle ORM
 - Database file: `app.db`
-- Users table includes: id, name, email, password (argon2 hashed), createdAt, updatedAt
+- Users table includes: id, name, email, password, createdAt, updatedAt
 
 ## Running the Server
 

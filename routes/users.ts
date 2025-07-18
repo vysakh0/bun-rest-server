@@ -1,5 +1,3 @@
-import { hash } from 'argon2';
-
 import { createdResponse, errorResponse, successResponse } from '@utils/response';
 import { validateUserData } from '@utils/validation';
 
@@ -19,7 +17,7 @@ export const createUser: AsyncHandler = async (req) => {
 
     // After validation, we know these fields are present
     const { name, email, password } = body as Required<CreateUserRequest>;
-    const hashedPassword = await hash(password);
+    const hashedPassword = await Bun.password.hash(password);
     await userQueries.create({ name, email, password: hashedPassword });
 
     return createdResponse({ message: 'User created successfully' });

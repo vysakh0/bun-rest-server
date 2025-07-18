@@ -1,5 +1,3 @@
-import { hash } from 'argon2';
-
 import { createdResponse, errorResponse } from '@utils/response';
 import { validateSignupData } from '@utils/validation';
 
@@ -36,7 +34,7 @@ export const signup: AsyncHandler = async (req) => {
       return errorResponse('Email already registered', HTTP_STATUS.CONFLICT);
     }
 
-    const hashedPassword = await hash(password);
+    const hashedPassword = await Bun.password.hash(password);
 
     const result: UserResponse[] = await userQueries
       .create({
