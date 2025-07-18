@@ -46,7 +46,6 @@ Default to using Bun instead of Node.js.
 
 ### SQLite Database
 
-- `Bun.Database` for direct SQLite operations instead of `better-sqlite3`
 - Only use `drizzle-orm` for schema management and migrations
 
 ### Testing
