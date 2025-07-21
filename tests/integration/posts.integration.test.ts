@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
+import { describe, test, expect, beforeAll, beforeEach, afterAll } from 'bun:test';
 
 import { buildPostData } from '@tests/factories/post.factory';
 import { buildUserData } from '@tests/factories/user.factory';
@@ -8,12 +8,16 @@ import '@tests/setup'; // This imports the setup hooks
 describe('Posts API Integration Tests', () => {
   let server: TestServer;
   let authToken: string;
+  let userData: any;
 
   beforeAll(async () => {
     server = createTestServer();
+  });
 
-    // Create a user and get auth token for protected routes
-    const userData = buildUserData();
+  beforeEach(async () => {
+    // Create a fresh user and get auth token before each test
+    // This ensures the user exists after database cleanup
+    userData = buildUserData();
     const signupResponse = await makeJsonRequest(
       server.baseUrl,
       '/api/auth/signup',

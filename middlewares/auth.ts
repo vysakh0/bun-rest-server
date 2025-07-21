@@ -33,9 +33,9 @@ export const withAuth = (handler: AsyncHandler | AsyncNoRequestHandler): AsyncHa
   };
 };
 
-export const getUserId = (req: Request): number | null => {
-  const userId = req.headers.get('X-User-Id');
-  return userId ? parseInt(userId, 10) : null;
+export const getUserId = (req: Request): number => {
+  const userId = req.headers.get('X-User-Id') as string;
+  return parseInt(userId, 10);
 };
 
 export const requireUserId = (req: Request): number | Response => {

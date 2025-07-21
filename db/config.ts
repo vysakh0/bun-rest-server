@@ -1,18 +1,16 @@
-import { Database } from 'bun:sqlite';
-import { drizzle } from 'drizzle-orm/bun-sqlite';
-import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
-
-import * as schema from './schema';
+import { sql } from 'bun';
 
 const isTestEnv = process.env.NODE_ENV === 'test';
-const dbPath = isTestEnv ? ':memory:' : 'app.db';
 
-const sqlite = new Database(dbPath);
-export const db = drizzle(sqlite, { schema });
+// PostgreSQL connection - Bun automatically uses DATABASE_URL or POSTGRES_URL
+// Bun will automatically load .env.test when NODE_ENV=test
 
-// Run migrations for test database
+// Run migrations for test database on startup
 if (isTestEnv) {
-  migrate(db, { migrationsFolder: './db/migrations' });
+  const { migrate } = await import('../scripts/migrate');
+  await migrate();
 }
 
-export type DatabaseClient = typeof db;
+// Export the sql template literal for queries
+export { sql };
+export type DatabaseClient = typeof sql;

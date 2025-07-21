@@ -8,7 +8,10 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:migrate": "bun run ./db/migrate.ts",
+    "db:create-migration": "bun run ./db/create-migration.ts",
+    "db:recreate": "bun run ./scripts/recreate-db.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -29,8 +32,6 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "drizzle-kit": "^0.31.4",
-    "drizzle-orm": "^0.44.3",
     "jsonwebtoken": "^9.0.2"
   }
 }

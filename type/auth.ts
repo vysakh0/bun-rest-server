@@ -1,3 +1,5 @@
+import type { UserResponse } from './users';
+
 export interface SignupRequest {
   name?: string;
   email?: string;
@@ -12,12 +14,4 @@ export interface LoginRequest {
 export interface LoginResponse {
   user: UserResponse;
   token: string;
-}
-
-export interface UserResponse {
-  id: number;
-  name: string;
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
 }

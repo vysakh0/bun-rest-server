@@ -1,9 +1,6 @@
-import { eq } from 'drizzle-orm';
+import { sql } from '@db/config';
 
-import * as schema from '@db/schema';
-import type { InsertUser } from '@db/schema/users';
-
-import type { TestDatabase } from '@tests/helpers/db.helpers';
+import type { InsertUser, User } from '@type/users';
 
 let userCounter = 0;
 
@@ -21,30 +18,35 @@ export const resetUserCounter = (): void => {
   userCounter = 0;
 };
 
-export const createUserInDb = async (
-  db: TestDatabase,
-  overrides?: Partial<InsertUser>
-): Promise<any> => {
+export const createUserInDb = async (overrides?: Partial<InsertUser>): Promise<User> => {
   const userData = buildUserData(overrides);
-  const [user] = await db.insert(schema.users).values(userData).returning();
+  const [user] = await sql<User[]>`
+    INSERT INTO users (name, email, password)
+    VALUES (${userData.name}, ${userData.email}, ${userData.password})
+    RETURNING *
+  `;
   return user;
 };
 
 export const createUsersInDb = async (
-  db: TestDatabase,
   count: number,
   overrides?: Partial<InsertUser>
-): Promise<any[]> => {
-  const usersData = Array.from({ length: count }, () => buildUserData(overrides));
-  const users = await db.insert(schema.users).values(usersData).returning();
+): Promise<User[]> => {
+  const users: User[] = [];
+  for (let i = 0; i < count; i++) {
+    const user = await createUserInDb(overrides);
+    users.push(user);
+  }
   return users;
 };
 
-export const getAllUsers = async (db: TestDatabase): Promise<any[]> => {
-  return await db.select().from(schema.users);
+export const getAllUsers = async (): Promise<User[]> => {
+  return sql<User[]>`SELECT * FROM users ORDER BY id`;
 };
 
-export const getUserByEmail = async (db: TestDatabase, email: string): Promise<any | null> => {
-  const users = await db.select().from(schema.users).where(eq(schema.users.email, email));
+export const getUserByEmail = async (email: string): Promise<User | null> => {
+  const users = await sql<User[]>`
+    SELECT * FROM users WHERE email = ${email} LIMIT 1
+  `;
   return users[0] || null;
 };

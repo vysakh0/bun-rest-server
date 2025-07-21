@@ -2,8 +2,6 @@ import { HTTP_STATUS } from '@constants/http';
 
 import { createdResponse, errorResponse, successResponse } from '@utils/response';
 
-import { posts } from '@db/schema';
-
 import type { AsyncHandler } from '@type/handlers';
 import type { CreatePostRequest } from '@type/posts';
 
@@ -12,7 +10,7 @@ import { getUserId } from '@middlewares/auth';
 import { postQueries } from '@queries/posts';
 
 export const createPost: AsyncHandler = async (req) => {
-  const userId = getUserId(req)!; // Safe to use ! because withAuth ensures userId exists
+  const userId = getUserId(req);
 
   const body = (await req.json()) as CreatePostRequest;
 
@@ -20,17 +18,10 @@ export const createPost: AsyncHandler = async (req) => {
     return errorResponse('Title is required', HTTP_STATUS.BAD_REQUEST);
   }
 
-  const result = await postQueries
-    .create({
-      title: body.title.trim(),
-      userId,
-    })
-    .returning({
-      id: posts.id,
-      title: posts.title,
-      createdAt: posts.createdAt,
-      updatedAt: posts.updatedAt,
-    });
+  const result = await postQueries.create({
+    title: body.title.trim(),
+    userId,
+  });
 
   const [newPost] = result;
 
@@ -38,11 +29,22 @@ export const createPost: AsyncHandler = async (req) => {
     return errorResponse('Failed to create post', HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 
-  return createdResponse(newPost);
+  // Convert snake_case to camelCase for response
+  const postResponse = {
+    id: newPost.id,
+    title: newPost.title,
+    createdAt: newPost.created_at,
+    updatedAt: newPost.updated_at,
+  };
+
+  return createdResponse(postResponse);
 };
 
 export const getUserPosts: AsyncHandler = async (req) => {
-  const userId = getUserId(req)!; // Safe to use ! because withAuth ensures userId exists
+  const userId = getUserId(req);
+  if (!userId) {
+    return errorResponse('Unauthorized', HTTP_STATUS.UNAUTHORIZED);
+  }
 
   const userPosts = await postQueries.findByUserId(userId);
 

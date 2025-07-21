@@ -2,8 +2,6 @@ import { createdResponse, errorResponse, successResponse } from '@utils/response
 import { generateToken } from '@utils/token';
 import { validateSignupData, validateLoginData } from '@utils/validation';
 
-import { users } from '@db/schema';
-
 import { HTTP_STATUS } from '@/constants/http';
 import type { SignupRequest, LoginRequest, UserResponse, LoginResponse } from '@/type/auth';
 import type { AsyncHandler } from '@/type/handlers';
@@ -27,23 +25,27 @@ export const signup: AsyncHandler = async (req) => {
 
   const hashedPassword = await Bun.password.hash(password);
 
-  const result: UserResponse[] = await userQueries
-    .create({
-      name,
-      email,
-      password: hashedPassword,
-    })
-    .returning({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      createdAt: users.createdAt,
-      updatedAt: users.updatedAt,
-    });
+  const result = await userQueries.create({
+    name,
+    email,
+    password: hashedPassword,
+  });
 
   const [newUser] = result;
 
-  return createdResponse(newUser);
+  if (!newUser) {
+    return errorResponse('Failed to create user', HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+
+  const userResponse: UserResponse = {
+    id: newUser.id,
+    name: newUser.name,
+    email: newUser.email,
+    createdAt: newUser.created_at,
+    updatedAt: newUser.updated_at,
+  };
+
+  return createdResponse(userResponse);
 };
 
 export const login: AsyncHandler = async (req) => {
@@ -70,8 +72,8 @@ export const login: AsyncHandler = async (req) => {
     id: user.id,
     name: user.name,
     email: user.email,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
+    createdAt: user.created_at,
+    updatedAt: user.updated_at,
   };
 
   const token = generateToken(user.id);
